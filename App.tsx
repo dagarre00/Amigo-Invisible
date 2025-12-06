@@ -485,85 +485,87 @@ const App: React.FC = () => {
   const renderLobby = () => {
     if (!room) return null;
     return (
-      <div className="max-w-2xl mx-auto p-4 md:p-8 relative z-10 pb-48 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-sm font-mono mb-4 cursor-pointer hover:bg-slate-700 transition-colors" onClick={handleCopyLink}>
-             <span>CÓDIGO:</span>
-             <span className="text-white font-bold tracking-widest">{room.id}</span>
-             <svg className="w-3 h-3 ml-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+      <>
+        <div className="max-w-2xl mx-auto p-4 md:p-8 relative z-10 pb-48 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-sm font-mono mb-4 cursor-pointer hover:bg-slate-700 transition-colors" onClick={handleCopyLink}>
+               <span>CÓDIGO:</span>
+               <span className="text-white font-bold tracking-widest">{room.id}</span>
+               <svg className="w-3 h-3 ml-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2">{room.name}</h1>
+            <p className="text-amber-500/80 font-festive text-2xl">"{room.theme}"</p>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">{room.name}</h1>
-          <p className="text-amber-500/80 font-festive text-2xl">"{room.theme}"</p>
-        </div>
 
-        {/* Input */}
-        <div className="bg-slate-800/80 backdrop-blur-md rounded-2xl p-2 flex gap-2 shadow-lg border border-slate-700 mb-8">
-          <input 
-            type="text" 
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddParticipant()}
-            placeholder="Escribe un nombre para agregar..."
-            className="flex-1 bg-transparent border-none text-white px-4 focus:ring-0 focus:outline-none placeholder-slate-500"
-          />
-          <Button onClick={handleAddParticipant} disabled={!newName.trim() || isLoading} isLoading={isLoading} className="rounded-xl py-2 px-6">
-            Agregar
-          </Button>
-        </div>
+          {/* Input */}
+          <div className="bg-slate-800/80 backdrop-blur-md rounded-2xl p-2 flex gap-2 shadow-lg border border-slate-700 mb-8">
+            <input 
+              type="text" 
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddParticipant()}
+              placeholder="Escribe un nombre para agregar..."
+              className="flex-1 bg-transparent border-none text-white px-4 focus:ring-0 focus:outline-none placeholder-slate-500"
+            />
+            <Button onClick={handleAddParticipant} disabled={!newName.trim() || isLoading} isLoading={isLoading} className="rounded-xl py-2 px-6">
+              Agregar
+            </Button>
+          </div>
 
-        {/* List */}
-        <div className="space-y-3 mb-8">
-           {room.participants.length === 0 && (
-             <div className="text-center p-8 border-2 border-dashed border-slate-800 rounded-2xl text-slate-600">
-               Aún no hay participantes. ¡Agrégate a ti mismo y a tus amigos!
-             </div>
-           )}
-           {room.participants.map(p => (
-             <div key={p.id} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 flex items-center justify-between group hover:border-slate-600 transition-all">
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-slate-300 font-bold shadow-inner">
-                   {p.name.charAt(0).toUpperCase()}
+          {/* List */}
+          <div className="space-y-3 mb-8">
+             {room.participants.length === 0 && (
+               <div className="text-center p-8 border-2 border-dashed border-slate-800 rounded-2xl text-slate-600">
+                 Aún no hay participantes. ¡Agrégate a ti mismo y a tus amigos!
+               </div>
+             )}
+             {room.participants.map(p => (
+               <div key={p.id} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 flex items-center justify-between group hover:border-slate-600 transition-all">
+                 <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-slate-300 font-bold shadow-inner">
+                     {p.name.charAt(0).toUpperCase()}
+                   </div>
+                   <div>
+                     <div className="font-bold text-white">{p.name}</div>
+                     {p.exclusions.length > 0 && (
+                       <div className="text-xs text-red-400 flex items-center gap-1">
+                         <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                         Excluye a {p.exclusions.length} personas
+                       </div>
+                     )}
+                   </div>
                  </div>
-                 <div>
-                   <div className="font-bold text-white">{p.name}</div>
-                   {p.exclusions.length > 0 && (
-                     <div className="text-xs text-red-400 flex items-center gap-1">
-                       <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                       Excluye a {p.exclusions.length} personas
-                     </div>
-                   )}
+                 
+                 <div className="flex items-center gap-2">
+                   <button 
+                     onClick={() => setEditingExclusionsId(p.id)}
+                     className={`p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium ${p.exclusions.length > 0 ? 'text-amber-400 bg-amber-400/10' : 'text-slate-500 hover:text-slate-300 bg-slate-800 hover:bg-slate-700'}`}
+                     title="Gestionar Exclusiones"
+                   >
+                     <CogIcon />
+                     <span className="hidden sm:inline">Exclusiones</span>
+                   </button>
+                   <button 
+                     onClick={() => handleRemoveParticipant(p.id)}
+                     className="p-2 text-slate-600 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+                   >
+                     <TrashIcon />
+                   </button>
                  </div>
                </div>
-               
-               <div className="flex items-center gap-2">
-                 <button 
-                   onClick={() => setEditingExclusionsId(p.id)}
-                   className={`p-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium ${p.exclusions.length > 0 ? 'text-amber-400 bg-amber-400/10' : 'text-slate-500 hover:text-slate-300 bg-slate-800 hover:bg-slate-700'}`}
-                   title="Gestionar Exclusiones"
-                 >
-                   <CogIcon />
-                   <span className="hidden sm:inline">Exclusiones</span>
-                 </button>
-                 <button 
-                   onClick={() => handleRemoveParticipant(p.id)}
-                   className="p-2 text-slate-600 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
-                 >
-                   <TrashIcon />
-                 </button>
-               </div>
-             </div>
-           ))}
-        </div>
-        
-        {drawError && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-200 rounded-xl text-center text-sm animate-pulse">
-            {drawError}
+             ))}
           </div>
-        )}
+          
+          {drawError && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-200 rounded-xl text-center text-sm animate-pulse">
+              {drawError}
+            </div>
+          )}
+        </div>
 
-        {/* Footer Action */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 to-transparent pt-12 z-20 flex justify-center">
+        {/* Footer Action - Moved outside the animated container to fix fixed positioning contexts */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-950 to-transparent pt-12 z-20 flex justify-center animate-in fade-in duration-1000">
            <Button 
              className="w-full max-w-md shadow-2xl shadow-amber-500/20 text-lg py-4"
              onClick={handleDraw}
@@ -573,7 +575,7 @@ const App: React.FC = () => {
              Sortear Nombres 🎲
            </Button>
         </div>
-      </div>
+      </>
     );
   };
 
