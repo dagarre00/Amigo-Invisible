@@ -80,56 +80,80 @@ export const saveRoom = async (room: Room): Promise<boolean> => {
   }
 };
 
-// The Drawing Logic (Remains Client Side, result is saved via saveRoom)
+// The Drawing Logic
+// Enforces: No Self Draw, Exclusions Applied, 1-to-1 Mapping (Bijection)
 export const drawNames = (participants: Participant[]): Assignment[] | null => {
+  // Need at least 2 people to exchange gifts
+  if (!participants || participants.length < 2) return null;
+
   const ids = participants.map(p => p.id);
   
-  // Create a map for fast lookup of exclusions
-  const exclusionMap: Record<string, Set<string>> = {};
+  // 1. Prepare Exclusion Constraints Map
+  const constraints = new Map<string, Set<string>>();
   participants.forEach(p => {
-    exclusionMap[p.id] = new Set(p.exclusions);
-    exclusionMap[p.id].add(p.id); // Cannot draw self
+    const pExclusions = new Set(p.exclusions);
+    pExclusions.add(p.id); // RULE: Users cannot draw themselves
+    constraints.set(p.id, pExclusions);
   });
 
-  const solve = (
-    currentGiverIndex: number, 
-    usedReceivers: Set<string>, 
-    assignments: Assignment[]
-  ): boolean => {
-    if (currentGiverIndex >= ids.length) {
-      return true; // All assigned
+  // 2. Sort Givers by 'Most Constrained First' (Heuristic)
+  // Process people with more exclusions first to reduce backtracking.
+  // This helps significantly when the exclusion graph is dense.
+  const sortedGiverIds = [...ids].sort((a, b) => {
+    const countA = constraints.get(a)?.size || 0;
+    const countB = constraints.get(b)?.size || 0;
+    return countB - countA;
+  });
+
+  const assignments: Assignment[] = [];
+  const assignedReceivers = new Set<string>();
+
+  // 3. Recursive Backtracking Solver
+  const solve = (index: number): boolean => {
+    // Base Case: All givers have successfully been assigned a receiver
+    if (index >= sortedGiverIds.length) {
+      return true;
     }
 
-    const giverId = ids[currentGiverIndex];
-    const invalidReceivers = exclusionMap[giverId];
+    const currentGiverId = sortedGiverIds[index];
+    const invalidForGiver = constraints.get(currentGiverId)!;
 
-    // Shuffle potential receivers to ensure randomness
-    const potentialReceivers = ids.filter(id => !usedReceivers.has(id) && !invalidReceivers.has(id));
-    
+    // Find all valid candidates for this specific giver
+    // - Must be a valid participant ID
+    // - Must not be already assigned (One-to-One / Bijective property)
+    // - Must not be in exclusion list (Exclusions applied & No Self Draw)
+    const candidates = ids.filter(candidateId => 
+      !assignedReceivers.has(candidateId) && 
+      !invalidForGiver.has(candidateId)
+    );
+
+    // Shuffle candidates to ensure fair/random outcomes every time
     // Fisher-Yates shuffle
-    for (let i = potentialReceivers.length - 1; i > 0; i--) {
+    for (let i = candidates.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [potentialReceivers[i], potentialReceivers[j]] = [potentialReceivers[j], potentialReceivers[i]];
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
     }
 
-    for (const receiverId of potentialReceivers) {
-      assignments.push({ giverId, receiverId });
-      usedReceivers.add(receiverId);
-      
-      if (solve(currentGiverIndex + 1, usedReceivers, assignments)) {
+    // Try each candidate via Depth First Search
+    for (const receiverId of candidates) {
+      assignments.push({ giverId: currentGiverId, receiverId });
+      assignedReceivers.add(receiverId);
+
+      if (solve(index + 1)) {
         return true;
       }
-      
-      // Backtrack
+
+      // Backtrack: This path didn't work, undo assignment
       assignments.pop();
-      usedReceivers.delete(receiverId);
+      assignedReceivers.delete(receiverId);
     }
 
-    return false;
+    return false; // Dead end: No valid candidates allowed us to complete the chain
   };
 
-  const results: Assignment[] = [];
-  const success = solve(0, new Set(), results);
-  
-  return success ? results : null;
+  if (solve(0)) {
+    return assignments;
+  } else {
+    return null; // No solution possible with current constraints
+  }
 };
