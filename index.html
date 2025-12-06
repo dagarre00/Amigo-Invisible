@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amigo Invisible</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Mountains+of+Christmas:wght@400;700&display=swap');
+      
+      body {
+        font-family: 'Outfit', sans-serif;
+      }
+      
+      .font-festive {
+        font-family: 'Mountains of Christmas', cursive;
+      }
+
+      @keyframes snow {
+        0% { transform: translateY(-10vh) translateX(0); opacity: 1; }
+        100% { transform: translateY(110vh) translateX(20px); opacity: 0.3; }
+      }
+      
+      .snowflake {
+        position: fixed;
+        top: -10vh;
+        color: #fff;
+        opacity: 0.8;
+        font-size: 1.5em;
+        animation: snow linear infinite;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      /* Custom scrollbar for modal content */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1e293b; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #475569; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #64748b; 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.3"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen overflow-x-hidden selection:bg-amber-500/30">
+    <div id="root"></div>
+  </body>
+</html>
