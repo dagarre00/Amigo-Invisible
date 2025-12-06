@@ -3,16 +3,28 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Access environment variables safely across different environments (Vite/Node)
 const getEnv = (key: string) => {
-  // @ts-ignore
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
+  try {
+    // Vite / Modern Browsers
     // @ts-ignore
-    return import.meta.env[key];
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      // @ts-ignore
+      return import.meta.env[key];
+    }
+  } catch (e) {
+    // Ignore syntax or access errors
   }
-  // @ts-ignore
-  if (typeof process !== 'undefined' && process.env) {
+
+  try {
+    // Node / Webpack / Classic
     // @ts-ignore
-    return process.env[key];
+    if (typeof process !== 'undefined' && process.env) {
+      // @ts-ignore
+      return process.env[key];
+    }
+  } catch (e) {
+    // Ignore
   }
+  
   return '';
 };
 
@@ -28,7 +40,8 @@ if (supabaseUrl && supabaseKey) {
     console.error("Failed to initialize Supabase client:", error);
   }
 } else {
-  console.warn("Supabase credentials (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY) not found. Falling back to LocalStorage.");
+  // Only warn in development console, do not crash
+  console.log("Running in offline/local mode (Supabase credentials not found).");
 }
 
 export const supabase = client;
